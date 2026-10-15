@@ -27,3 +27,11 @@ Content-Type: application/json
 {
   "categoryId": 999
 }
+
+### Move a product to another existing category
+PATCH http://localhost:3000/products/4
+Content-Type: application/json
+
+{
+  "categoryId": 3
+}

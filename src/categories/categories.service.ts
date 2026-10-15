@@ -14,6 +14,7 @@ import {
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
+import { Product } from '../products/entities/product.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -76,5 +77,16 @@ export class CategoriesService {
       }
       throw error;
     }
+  }
+
+  async findProducts(id: number): Promise<Product[]> {
+    const category = await this.categoriesRepository.findOne({
+      where: { id },
+      relations: { products: true },
+    });
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+    return category.products;
   }
 }

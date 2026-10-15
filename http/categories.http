@@ -1,18 +1,10 @@
-### 1. Duplicate category name (expect 409)
+### Create an empty category (expect 201)
 POST http://localhost:3000/categories
 Content-Type: application/json
 
 {
-  "name": "NAME_OF_CATEGORY_A"
+  "name": "Accessories Empty"
 }
 
-### 2. Rename a category to an existing name (expect 409)
-PATCH http://localhost:3000/categories/ID_OF_CATEGORY_B
-Content-Type: application/json
-
-{
-  "name": "NAME_OF_CATEGORY_A"
-}
-
-### Delete a category that still has products (expect 409)
-DELETE http://localhost:3000/categories/1
+### Products of a category that has none (expect: your guess)
+GET http://localhost:3000/categories/1/products

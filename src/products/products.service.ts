@@ -34,11 +34,14 @@ export class ProductsService {
   }
 
   async findAll(): Promise<Product[]> {
-    return this.productsRepository.find();
+    return this.productsRepository.find({ relations: { category: true } });
   }
 
   async findOne(id: number): Promise<Product> {
-    const product = await this.productsRepository.findOneBy({ id });
+    const product = await this.productsRepository.findOne({
+      where: { id },
+      relations: { category: true },
+    });
     if (!product) {
       throw new NotFoundException('Product not found');
     }
@@ -49,16 +52,26 @@ export class ProductsService {
     id: number,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
-    const product = await this.findOne(id);
-    const updated = { ...product, ...updateProductDto };
+    // Load the row by id and apply the new values on top, without loading relations
+    const product = await this.productsRepository.preload({
+      id,
+      ...updateProductDto,
+    });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
     try {
-      return await this.productsRepository.save(updated);
+      await this.productsRepository.save(product);
     } catch (error) {
       if (getPgErrorCode(error) === PG_FOREIGN_KEY_VIOLATION) {
         throw new BadRequestException('Category does not exist');
       }
       throw error;
     }
+
+    // Read it again so the response has the fresh category
+    return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
