@@ -1,74 +1,15 @@
-### 1. Create category with description (expect 201)
+### 1. Duplicate category name (expect 409)
 POST http://localhost:3000/categories
 Content-Type: application/json
 
 {
-  "name": "Dresses",
-  "description": "Evening and prom dresses"
+  "name": "NAME_OF_CATEGORY_A"
 }
 
-### 2. Create category without description (expect 201, description null)
-POST http://localhost:3000/categories
+### 2. Rename a category to an existing name (expect 409)
+PATCH http://localhost:3000/categories/ID_OF_CATEGORY_B
 Content-Type: application/json
 
 {
-  "name": "Shoes"
-}
-
-### 3. Empty name (expect 400)
-POST http://localhost:3000/categories
-Content-Type: application/json
-
-{
-  "name": ""
-}
-
-### 4. Duplicate name (expect: ?)
-POST http://localhost:3000/categories
-Content-Type: application/json
-
-{
-  "name": "Dresses"
-}
-
-### 5. List categories (expect 200)
-GET http://localhost:3000/categories
-
-### 6. Missing category (expect 404)
-GET http://localhost:3000/categories/999
-
-### 7. Invalid id (expect 400)
-GET http://localhost:3000/categories/abc
-
-### 8a. Update description (expect 200)
-PATCH http://localhost:3000/categories/3
-Content-Type: application/json
-
-{
-  "description": "Long evening"
-}
-
-### Rename to an existing name (expect 409)
-PATCH http://localhost:3000/categories/1
-Content-Type: application/json
-
-{
-  "name": "Bags"
-}
-
-### 8b. Check the update was saved (expect the new description)
-GET http://localhost:3000/categories/1
-
-### 9a. Delete category (expect 204)
-DELETE http://localhost:3000/categories/2
-
-### 9b. Check it is gone (expect 404)
-GET http://localhost:3000/categories/2
-
-### Rename to an existing name (expect 409)
-PATCH http://localhost:3000/categories/1
-Content-Type: application/json
-
-{
-  "name": "Dresses"
+  "name": "NAME_OF_CATEGORY_A"
 }

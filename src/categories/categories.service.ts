@@ -4,13 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { getPgErrorCode, PG_UNIQUE_VIOLATION } from '../common/database-errors';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
-
-// PostgreSQL error code for a duplicate value in a unique column
-const UNIQUE_VIOLATION = '23505';
 
 @Injectable()
 export class CategoriesService {
@@ -25,7 +23,7 @@ export class CategoriesService {
       // "return await" is required here, otherwise catch never sees save errors
       return await this.categoriesRepository.save(category);
     } catch (error) {
-      if (this.isUniqueViolation(error)) {
+      if (getPgErrorCode(error) === PG_UNIQUE_VIOLATION) {
         throw new ConflictException('Category name already exists');
       }
       // Any other error is a real server problem, so let it become a 500
@@ -54,8 +52,8 @@ export class CategoriesService {
     try {
       return await this.categoriesRepository.save(updated);
     } catch (error) {
-      if (this.isUniqueViolation(error)) {
-        throw new ConflictException('Category already exists');
+      if (getPgErrorCode(error) === PG_UNIQUE_VIOLATION) {
+        throw new ConflictException('Category name already exists');
       }
       throw error;
     }
@@ -64,15 +62,5 @@ export class CategoriesService {
   async remove(id: number): Promise<void> {
     const category = await this.findOne(id);
     await this.categoriesRepository.remove(category);
-  }
-
-  private isUniqueViolation(error: unknown): boolean {
-    // Only database query errors carry a PostgreSQL error code
-    if (!(error instanceof QueryFailedError)) {
-      return false;
-    }
-    // The PostgreSQL driver puts the error code on driverError.code
-    const pgError = error.driverError as { code?: string };
-    return pgError.code === UNIQUE_VIOLATION;
   }
 }

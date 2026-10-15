@@ -1,59 +1,29 @@
-### Create a valid product
+### 3. Create product with a missing category (expect 400)
 POST http://localhost:3000/products
 Content-Type: application/json
 
 {
-  "name": "Dress D",
+  "name": "Ghost Dress",
+  "price": 300,
+  "stock": 2,
+  "categoryId": 999
+}
+
+### 4. Create product with an existing category (expect 201)
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "Silk Evening Dress",
   "price": 450,
-  "stock": 3
+  "stock": 5,
+  "categoryId": 1
 }
 
-### Invalid data
-POST http://localhost:3000/products
+### 5. Move a product to a missing category (expect 400)
+PATCH http://localhost:3000/products/PRODUCT_ID
 Content-Type: application/json
 
 {
-  "name": "",
-  "price": "cheap",
-  "stock": -1
+  "categoryId": 999
 }
-
-### Extra field that is not allowed
-POST http://localhost:3000/products
-Content-Type: application/json
-
-{
-  "name": "Dress E",
-  "price": 100,
-  "stock": 1,
-  "id": 99
-}
-
-
-
-### Update a product
-PATCH http://localhost:3000/products/1
-Content-Type: application/json
-
-{
-  "price": 350
-}
-
-### Delete a product
-DELETE http://localhost:3000/products/3
-
-### Get the deleted product, should be 404
-GET http://localhost:3000/products/1
-
-
-### Invalid id
-GET http://localhost:3000/products/abc
-
-### Invalid id on update
-PATCH http://localhost:3000/products/abc
-Content-Type: application/json
-
-{ "price": 100 }
-
-### Invalid id on delete
-DELETE http://localhost:3000/products/abc
