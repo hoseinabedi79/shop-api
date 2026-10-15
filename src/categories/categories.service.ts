@@ -5,7 +5,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { getPgErrorCode, PG_UNIQUE_VIOLATION } from '../common/database-errors';
+import {
+  getPgErrorCode,
+  PG_FOREIGN_KEY_VIOLATION,
+  PG_RESTRICT_VIOLATION,
+  PG_UNIQUE_VIOLATION,
+} from '../common/database-errors';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
@@ -61,6 +66,15 @@ export class CategoriesService {
 
   async remove(id: number): Promise<void> {
     const category = await this.findOne(id);
-    await this.categoriesRepository.remove(category);
+    try {
+      await this.categoriesRepository.remove(category);
+    } catch (error) {
+      const code = getPgErrorCode(error);
+      // RESTRICT keys raise 23001, NO ACTION keys raise 23503
+      if (code === PG_RESTRICT_VIOLATION || code === PG_FOREIGN_KEY_VIOLATION) {
+        throw new ConflictException('Category still has products');
+      }
+      throw error;
+    }
   }
 }

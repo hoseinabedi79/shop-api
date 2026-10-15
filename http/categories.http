@@ -13,3 +13,6 @@ Content-Type: application/json
 {
   "name": "NAME_OF_CATEGORY_A"
 }
+
+### Delete a category that still has products (expect 409)
+DELETE http://localhost:3000/categories/1
