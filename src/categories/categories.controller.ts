@@ -32,6 +32,11 @@ export class CategoriesController {
     return this.categoriesService.findOne(id);
   }
 
+  @Get(':id/products')
+  findProducts(@Param('id', ParseIntPipe) id: number) {
+    return this.categoriesService.findProducts(id);
+  }
+
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
