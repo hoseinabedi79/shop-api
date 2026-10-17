@@ -1,10 +1,27 @@
-### Create an empty category (expect 201)
+### 1. Create a category (expect 201, id: 1)
 POST http://localhost:3000/categories
 Content-Type: application/json
 
 {
-  "name": "Accessories Empty"
+  "name": "Dresses",
+  "description": "Evening and party dresses"
 }
 
-### Products of a category that has none (expect: your guess)
-GET http://localhost:3000/categories/1/products
+### 4. Delete a category that still has products (expect 409)
+DELETE http://localhost:3000/categories/1
+
+### 7. Create a second category (expect 201, id: 2)
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "name": "Bags"
+}
+
+### 10. Rename to an existing name (expect 409)
+PATCH http://localhost:3000/categories/3
+Content-Type: application/json
+
+{
+  "name": "Dresses"
+}

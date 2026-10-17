@@ -1,37 +1,21 @@
-### 3. Create product with a missing category (expect 400)
+### 2. Create a product in category 1 (expect 201)
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "Red Evening Dress",
+  "price": 250,
+  "stock": 10,
+  "categoryId": 1
+}
+
+### 5. Create a product with a missing category (expect 400)
 POST http://localhost:3000/products
 Content-Type: application/json
 
 {
   "name": "Ghost Dress",
-  "price": 300,
-  "stock": 2,
+  "price": 100,
+  "stock": 1,
   "categoryId": 999
-}
-
-### 4. Create product with an existing category (expect 201)
-POST http://localhost:3000/products
-Content-Type: application/json
-
-{
-  "name": "Silk Evening Dress",
-  "price": 450,
-  "stock": 5,
-  "categoryId": 1
-}
-
-### 5. Move a product to a missing category (expect 400)
-PATCH http://localhost:3000/products/PRODUCT_ID
-Content-Type: application/json
-
-{
-  "categoryId": 999
-}
-
-### Move a product to another existing category
-PATCH http://localhost:3000/products/4
-Content-Type: application/json
-
-{
-  "categoryId": 3
 }
