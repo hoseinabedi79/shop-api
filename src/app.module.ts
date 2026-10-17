@@ -23,7 +23,8 @@ import { CategoriesModule } from './categories/categories.module';
         password: config.getOrThrow<string>('DB_PASSWORD'),
         database: config.getOrThrow<string>('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: true,
+        // Schema changes now go through migrations only
+        synchronize: false,
         logging: true,
       }),
     }),
