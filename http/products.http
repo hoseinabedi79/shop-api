@@ -1,21 +1,41 @@
-### 2. Create a product in category 1 (expect 201)
+### 1. Same name as an existing product (expect 201, slug "red-shoes-2")
 POST http://localhost:3000/products
 Content-Type: application/json
 
 {
-  "name": "Red Evening Dress",
-  "price": 250,
-  "stock": 10,
+  "name": "Red Shoes",
+  "price": 3499,
+  "stock": 5,
+  "categoryId": 4
+}
+
+### 2. Custom slug gets cleaned (expect 201, slug "my-custom-slug")
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "Test Dress",
+  "slug": "My Custom Slug!",
+  "price": 5000,
+  "stock": 1,
   "categoryId": 1
 }
 
-### 5. Create a product with a missing category (expect 400)
+### 3. Rename keeps the slug (expect slug still "my-custom-slug")
+PATCH http://localhost:3000/products/32
+Content-Type: application/json
+
+{
+  "name": "Renamed Dress"
+}
+
+### 4. Name without letters or digits (expect 400)
 POST http://localhost:3000/products
 Content-Type: application/json
 
 {
-  "name": "Ghost Dress",
+  "name": "!!!",
   "price": 100,
   "stock": 1,
-  "categoryId": 999
+  "categoryId": 1
 }

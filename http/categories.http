@@ -1,27 +1,47 @@
-### 1. Create a category (expect 201, id: 1)
+### 1. New category (expect 201, slug "accessories")
 POST http://localhost:3000/categories
 Content-Type: application/json
 
 {
-  "name": "Dresses",
-  "description": "Evening and party dresses"
+  "name": "Accessories"
 }
 
-### 4. Delete a category that still has products (expect 409)
-DELETE http://localhost:3000/categories/1
-
-### 7. Create a second category (expect 201, id: 2)
+### 2. Different name, same slug as "Men's Shoes" (expect 201, slug "mens-shoes-2")
 POST http://localhost:3000/categories
 Content-Type: application/json
 
 {
-  "name": "Bags"
+  "name": "Mens Shoes"
 }
 
-### 10. Rename to an existing name (expect 409)
-PATCH http://localhost:3000/categories/3
+### 3. Rename keeps the slug (use the id from test 1; expect slug still "accessories")
+PATCH http://localhost:3000/categories/7
 Content-Type: application/json
 
 {
-  "name": "Dresses"
+  "name": "Bags & Accessories"
+}
+
+### 4. Change the slug on purpose (same id; expect slug "bags-accessories")
+PATCH http://localhost:3000/categories/7
+Content-Type: application/json
+
+{
+  "slug": "Bags Accessories"
+}
+
+### 5. Duplicate name still blocked (expect 409 "Category name already exists")
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "name": "Evening Wear"
+}
+
+### 6. Name without letters or digits (expect 400)
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "name": "???"
 }

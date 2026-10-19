@@ -1,10 +1,11 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not ,Repository } from 'typeorm';
 import {
   getPgErrorCode,
   PG_FOREIGN_KEY_VIOLATION,
@@ -15,6 +16,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 import { Product } from '../products/entities/product.entity';
+import { makeUniqueSlug ,slugify } from '../common/slug';
 
 @Injectable()
 export class CategoriesService {
@@ -24,7 +26,8 @@ export class CategoriesService {
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    const category = this.categoriesRepository.create(createCategoryDto);
+    const slug = await this.buildSlug(createCategoryDto.slug ?? createCategoryDto.name);
+    const category = this.categoriesRepository.create({ ...createCategoryDto, slug });
     try {
       // "return await" is required here, otherwise catch never sees save errors
       return await this.categoriesRepository.save(category);
@@ -54,7 +57,11 @@ export class CategoriesService {
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
     const category = await this.findOne(id);
-    const updated = { ...category, ...updateCategoryDto };
+    const changes = { ...updateCategoryDto };
+    if (updateCategoryDto.slug !== undefined) {
+      changes.slug = await this.buildSlug(updateCategoryDto.slug, id);
+    }
+    const updated = { ...category, ...changes };
     try {
       return await this.categoriesRepository.save(updated);
     } catch (error) {
@@ -88,5 +95,18 @@ export class CategoriesService {
       throw new NotFoundException('Category not found');
     }
     return category.products;
+  }
+
+  private async buildSlug(source: string, excludeId?: number): Promise<string> {
+    const base = slugify(source);
+    if (!base) {
+      throw new BadRequestException('Slug must contain at least one letter or digit');
+    }
+    return makeUniqueSlug(base, (candidate) =>
+      this.categoriesRepository.exists({
+        // When updating, the category's own current slug does not count as taken
+        where: excludeId ? { slug: candidate, id: Not(excludeId) } : { slug: candidate },
+      }),
+    );
   }
 }
