@@ -15,6 +15,9 @@ export class Product {
   @Column()
   name: string;
 
+  @Column({ unique: true })
+  slug: string;
+
   @Column('int')
   price: number;
 
