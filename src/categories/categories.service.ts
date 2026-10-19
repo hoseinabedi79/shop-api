@@ -97,6 +97,25 @@ export class CategoriesService {
     return category.products;
   }
 
+  async findBySlug(slug: string): Promise<Category> {
+    const category = await this.categoriesRepository.findOneBy({ slug });
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+    return category;
+  }
+
+  async findProductsBySlug(slug: string): Promise<Product[]> {
+    const category = await this.categoriesRepository.findOne({
+      where: { slug },
+      relations: { products: true },
+    });
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+    return category.products;
+  }
+
   private async buildSlug(source: string, excludeId?: number): Promise<string> {
     const base = slugify(source);
     if (!base) {

@@ -43,6 +43,17 @@ export class ProductsService {
     return product;
   }
 
+  async findBySlug(slug: string): Promise<Product> {
+    const product = await this.productsRepository.findOne({
+      where: { slug },
+      relations: { category: true },
+    });
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
+  }
+
   async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
     const changes = { ...updateProductDto };
     // The slug changes only when the client asks for it, never because the name changed

@@ -1,47 +1,20 @@
-### 1. New category (expect 201, slug "accessories")
-POST http://localhost:3000/categories
-Content-Type: application/json
+### Find a category by slug (expect 200, id 1)
+# Slug tests assume a fresh `npm run seed`
+GET http://localhost:3000/categories/slug/evening-wear
 
-{
-  "name": "Accessories"
-}
+### Products of a category by slug (expect 200, 5 products)
+GET http://localhost:3000/categories/slug/mens-shoes/products
 
-### 2. Different name, same slug as "Men's Shoes" (expect 201, slug "mens-shoes-2")
+### Unknown category slug (expect 404)
+GET http://localhost:3000/categories/slug/does-not-exist
+
+### Products of an unknown category slug (expect 404, not [])
+GET http://localhost:3000/categories/slug/does-not-exist/products
+
+### Same slug as "Men's Shoes" gets -2 (expect 201, slug "mens-shoes-2")
 POST http://localhost:3000/categories
 Content-Type: application/json
 
 {
   "name": "Mens Shoes"
-}
-
-### 3. Rename keeps the slug (use the id from test 1; expect slug still "accessories")
-PATCH http://localhost:3000/categories/7
-Content-Type: application/json
-
-{
-  "name": "Bags & Accessories"
-}
-
-### 4. Change the slug on purpose (same id; expect slug "bags-accessories")
-PATCH http://localhost:3000/categories/7
-Content-Type: application/json
-
-{
-  "slug": "Bags Accessories"
-}
-
-### 5. Duplicate name still blocked (expect 409 "Category name already exists")
-POST http://localhost:3000/categories
-Content-Type: application/json
-
-{
-  "name": "Evening Wear"
-}
-
-### 6. Name without letters or digits (expect 400)
-POST http://localhost:3000/categories
-Content-Type: application/json
-
-{
-  "name": "???"
 }

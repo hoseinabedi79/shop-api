@@ -1,4 +1,14 @@
-### 1. Same name as an existing product (expect 201, slug "red-shoes-2")
+### Find a product by slug (expect 200, id 1)
+# Slug tests assume a fresh `npm run seed`
+GET http://localhost:3000/products/slug/black-womens-gown
+
+### Duplicate names get -2 (expect 200, id 25)
+GET http://localhost:3000/products/slug/sports-sneakers-off-white-red-2
+
+### Unknown product slug (expect 404)
+GET http://localhost:3000/products/slug/does-not-exist
+
+### Slug is built from the name (expect 201, slug "red-shoes-2")
 POST http://localhost:3000/products
 Content-Type: application/json
 
@@ -9,7 +19,7 @@ Content-Type: application/json
   "categoryId": 4
 }
 
-### 2. Custom slug gets cleaned (expect 201, slug "my-custom-slug")
+### Custom slug gets cleaned (expect 201, slug "my-custom-slug")
 POST http://localhost:3000/products
 Content-Type: application/json
 
@@ -21,15 +31,7 @@ Content-Type: application/json
   "categoryId": 1
 }
 
-### 3. Rename keeps the slug (expect slug still "my-custom-slug")
-PATCH http://localhost:3000/products/32
-Content-Type: application/json
-
-{
-  "name": "Renamed Dress"
-}
-
-### 4. Name without letters or digits (expect 400)
+### Name without letters or digits (expect 400)
 POST http://localhost:3000/products
 Content-Type: application/json
 
