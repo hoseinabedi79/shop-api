@@ -2,6 +2,15 @@ import dataSource from '../data-source';
 import { Category } from '../categories/entities/category.entity';
 import { Product } from '../products/entities/product.entity';
 import { catalog } from './catalog';
+import { makeUniqueSlug, slugify } from '../common/slug';
+
+
+// Builds a slug that is not in the given set yet, then remembers it
+async function uniqueSlug(name: string, used: Set<string>): Promise<string> {
+  const slug = await makeUniqueSlug(slugify(name), async (candidate) => used.has(candidate));
+  used.add(slug);
+  return slug;
+}
 
 async function seed(): Promise<void> {
   // Never wipe a real database by accident
@@ -16,18 +25,24 @@ async function seed(): Promise<void> {
     await dataSource.transaction(async (manager) => {
       // Empty both tables and restart ids from 1, so the seed can run again safely
       await manager.query('TRUNCATE TABLE "products", "categories" RESTART IDENTITY');
+      // The tables are empty now, so we track the slugs we hand out in memory
+      const usedCategorySlugs = new Set<string>();
+      const usedProductSlugs = new Set<string>();
 
       for (const entry of catalog) {
         // Save the category first, so we get its id
         const category = await manager.save(Category, {
           name: entry.name,
+          slug: await uniqueSlug(entry.name, usedCategorySlugs),
           description: entry.description,
         });
 
-        // Attach every product of this entry to the new category
-        const products = entry.products.map((item) =>
-          manager.create(Product, { ...item, categoryId: category.id }),
-        );
+        // One by one, so a duplicate name sees the slug of the one before it
+        const products: Product[] = [];
+        for (const item of entry.products) {
+          const slug = await uniqueSlug(item.name, usedProductSlugs);
+          products.push(manager.create(Product, { ...item, slug, categoryId: category.id }));
+        }
         await manager.save(Product, products);
       }
     });
