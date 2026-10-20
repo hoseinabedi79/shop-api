@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { FindOptionsOrder, FindOptionsWhere, ILike, Not, Repository } from 'typeorm';
 import { getPgErrorCode, PG_FOREIGN_KEY_VIOLATION } from '../common/database-errors';
 import { makeUniqueSlug, slugify } from '../common/slug';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
+import { PaginatedResult } from '../common/paginated-result';
+import { ListProductsQueryDto } from './dto/list-products-query.dto';
 
 @Injectable()
 export class ProductsService {
@@ -28,8 +30,36 @@ export class ProductsService {
     }
   }
 
-  findAll(): Promise<Product[]> {
-    return this.productsRepository.find({ relations: { category: true } });
+  async findAll(query: ListProductsQueryDto): Promise<PaginatedResult<Product>> {
+    const { page, limit, categoryId, search, sort, order } = query;
+
+    // Add a condition only when the client sent that filter
+    const where: FindOptionsWhere<Product> = {};
+    if (categoryId !== undefined) {
+      where.categoryId = categoryId;
+    }
+    if (search) {
+      where.name = ILike(`%${search}%`);
+    }
+
+    // Sort by the requested field, then by id so equal values keep a stable order
+    const orderBy: FindOptionsOrder<Product> = { [sort]: order };
+    if (sort !== 'id') {
+      orderBy.id = 'asc';
+    }
+
+    const [data, total] = await this.productsRepository.findAndCount({
+      where,
+      relations: { category: true },
+      order: orderBy,
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data,
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async findOne(id: number): Promise<Product> {
