@@ -1,43 +1,19 @@
-### Find a product by slug (expect 200, id 1)
-# Slug tests assume a fresh `npm run seed`
-GET http://localhost:3000/products/slug/black-womens-gown
+### ---------- Category slug ----------
 
-### Duplicate names get -2 (expect 200, id 25)
-GET http://localhost:3000/products/slug/sports-sneakers-off-white-red-2
+### 18. By category slug (expect 5 items, ids 25 down to 21)
+GET http://localhost:3000/products?categorySlug=mens-shoes
 
-### Unknown product slug (expect 404)
-GET http://localhost:3000/products/slug/does-not-exist
+### 19. Unknown slug (expect 200, data [], total 0)
+GET http://localhost:3000/products?categorySlug=not-exists
 
-### Slug is built from the name (expect 201, slug "red-shoes-2")
-POST http://localhost:3000/products
-Content-Type: application/json
+### 20. Empty slug is ignored (expect total 30)
+GET http://localhost:3000/products?categorySlug=
 
-{
-  "name": "Red Shoes",
-  "price": 3499,
-  "stock": 5,
-  "categoryId": 4
-}
+### 21. Slug with search (expect 2 corsets)
+GET http://localhost:3000/products?categorySlug=evening-wear&search=corset
 
-### Custom slug gets cleaned (expect 201, slug "my-custom-slug")
-POST http://localhost:3000/products
-Content-Type: application/json
+### 22. Slug with price, same result as test 17 (expect 2)
+GET http://localhost:3000/products?categorySlug=mens-shoes&maxPrice=10000
 
-{
-  "name": "Test Dress",
-  "slug": "My Custom Slug!",
-  "price": 5000,
-  "stock": 1,
-  "categoryId": 1
-}
-
-### Name without letters or digits (expect 400)
-POST http://localhost:3000/products
-Content-Type: application/json
-
-{
-  "name": "!!!",
-  "price": 100,
-  "stock": 1,
-  "categoryId": 1
-}
+### 23. Id and slug that disagree (expect total 0)
+GET http://localhost:3000/products?categoryId=1&categorySlug=mens-shoes
