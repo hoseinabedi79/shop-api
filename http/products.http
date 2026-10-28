@@ -1,19 +1,27 @@
-### ---------- Category slug ----------
+### ---------- Timestamps ----------
+### Run "npm run seed" first: all seeded rows get the same createdAt
 
-### 18. By category slug (expect 5 items, ids 25 down to 21)
-GET http://localhost:3000/products?categorySlug=mens-shoes
+### 24. A product shows both dates, in UTC (ending with Z)
+GET http://localhost:3000/products/1
 
-### 19. Unknown slug (expect 200, data [], total 0)
-GET http://localhost:3000/products?categorySlug=not-exists
+### 25. Newest first (expect ids 30, 29, 28)
+GET http://localhost:3000/products?sort=createdAt&order=desc&limit=3
 
-### 20. Empty slug is ignored (expect total 30)
-GET http://localhost:3000/products?categorySlug=
+### 26. Oldest first (expect ids 1, 2, 3)
+GET http://localhost:3000/products?sort=createdAt&order=asc&limit=3
 
-### 21. Slug with search (expect 2 corsets)
-GET http://localhost:3000/products?categorySlug=evening-wear&search=corset
+### 27. Edit a product (expect updatedAt to move forward, createdAt to stay the same)
+PATCH http://localhost:3000/products/1
+Content-Type: application/json
 
-### 22. Slug with price, same result as test 17 (expect 2)
-GET http://localhost:3000/products?categorySlug=mens-shoes&maxPrice=10000
+{
+  "stock": 26
+}
 
-### 23. Id and slug that disagree (expect total 0)
-GET http://localhost:3000/products?categoryId=1&categorySlug=mens-shoes
+### 28. Same value again (expect updatedAt NOT to change, nothing was different)
+PATCH http://localhost:3000/products/1
+Content-Type: application/json
+
+{
+  "stock": 26
+}

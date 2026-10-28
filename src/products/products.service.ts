@@ -86,10 +86,11 @@ export class ProductsService {
       where.price = LessThanOrEqual(maxPrice);
     }
 
-    // Sort by the requested field, then by id so equal values keep a stable order
+    // Sort by the requested field, then by id in the same direction,
+    // so equal values keep a stable order that matches what was asked
     const orderBy: FindOptionsOrder<Product> = { [sort]: order };
     if (sort !== 'id') {
-      orderBy.id = 'asc';
+      orderBy.id = order;
     }
 
     const [data, total] = await this.productsRepository.findAndCount({
