@@ -1,43 +1,22 @@
-### Find a product by slug (expect 200, id 1)
-# Slug tests assume a fresh `npm run seed`
-GET http://localhost:3000/products/slug/black-womens-gown
+### ---------- Price range (cents) ----------
 
-### Duplicate names get -2 (expect 200, id 25)
-GET http://localhost:3000/products/slug/sports-sneakers-off-white-red-2
+### 11. Between $20 and $30 (expect 6 items, total 6)
+GET http://localhost:3000/products?minPrice=2000&maxPrice=3000
 
-### Unknown product slug (expect 404)
-GET http://localhost:3000/products/slug/does-not-exist
+### 12. From $150 up (expect 2: Prada Women Bag, Marni Red & Black Suit)
+GET http://localhost:3000/products?minPrice=15000
 
-### Slug is built from the name (expect 201, slug "red-shoes-2")
-POST http://localhost:3000/products
-Content-Type: application/json
+### 13. Up to $19.99, edge included (expect 3, all priced 1999)
+GET http://localhost:3000/products?maxPrice=1999
 
-{
-  "name": "Red Shoes",
-  "price": 3499,
-  "stock": 5,
-  "categoryId": 4
-}
+### 14. maxPrice=0 must still filter (expect 0 items, total 0, not 30)
+GET http://localhost:3000/products?maxPrice=0
 
-### Custom slug gets cleaned (expect 201, slug "my-custom-slug")
-POST http://localhost:3000/products
-Content-Type: application/json
+### 15. Swapped range (expect 400: minPrice cannot be greater than maxPrice)
+GET http://localhost:3000/products?minPrice=10000&maxPrice=2000
 
-{
-  "name": "Test Dress",
-  "slug": "My Custom Slug!",
-  "price": 5000,
-  "stock": 1,
-  "categoryId": 1
-}
+### 16. Negative price (expect 400)
+GET http://localhost:3000/products?minPrice=-5
 
-### Name without letters or digits (expect 400)
-POST http://localhost:3000/products
-Content-Type: application/json
-
-{
-  "name": "!!!",
-  "price": 100,
-  "stock": 1,
-  "categoryId": 1
-}
+### 17. Price with category (expect 2: Puma Future Rider Trainers, Nike Baseball Cleats)
+GET http://localhost:3000/products?categoryId=5&maxPrice=10000

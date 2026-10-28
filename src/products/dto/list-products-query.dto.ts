@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 // The only fields the list can be sorted by; anything else is rejected with 400
-export const PRODUCT_SORT_FIELDS = ['id', 'name', 'price'] as const;
+export const PRODUCT_SORT_FIELDS = ['id', 'name', 'price', 'stock'] as const;
 export type ProductSortField = (typeof PRODUCT_SORT_FIELDS)[number];
 
 export class ListProductsQueryDto {
@@ -27,6 +27,18 @@ export class ListProductsQueryDto {
   categoryId?: number;
 
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  minPrice? : number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  maxPrice? : number;
+
+  @IsOptional()
   @IsString()
   @MaxLength(100)
   search?: string;
@@ -37,5 +49,5 @@ export class ListProductsQueryDto {
 
   @IsOptional()
   @IsIn(['asc', 'desc'])
-  order: 'asc' | 'desc' = 'asc';
+  order: 'asc' | 'desc' = 'desc';
 }
