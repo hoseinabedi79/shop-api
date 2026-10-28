@@ -1,6 +1,6 @@
 import {
   Column,
-  Entity,
+  Entity, Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -33,6 +33,7 @@ export class Product {
   category: Category;
 
   // The raw foreign key, so we can read and write the id directly
+  @Index()
   @Column()
   categoryId: number;
 }
