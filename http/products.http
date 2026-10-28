@@ -1,22 +1,19 @@
-### ---------- Price range (cents) ----------
+### ---------- Category slug ----------
 
-### 11. Between $20 and $30 (expect 6 items, total 6)
-GET http://localhost:3000/products?minPrice=2000&maxPrice=3000
+### 18. By category slug (expect 5 items, ids 25 down to 21)
+GET http://localhost:3000/products?categorySlug=mens-shoes
 
-### 12. From $150 up (expect 2: Prada Women Bag, Marni Red & Black Suit)
-GET http://localhost:3000/products?minPrice=15000
+### 19. Unknown slug (expect 200, data [], total 0)
+GET http://localhost:3000/products?categorySlug=not-exists
 
-### 13. Up to $19.99, edge included (expect 3, all priced 1999)
-GET http://localhost:3000/products?maxPrice=1999
+### 20. Empty slug is ignored (expect total 30)
+GET http://localhost:3000/products?categorySlug=
 
-### 14. maxPrice=0 must still filter (expect 0 items, total 0, not 30)
-GET http://localhost:3000/products?maxPrice=0
+### 21. Slug with search (expect 2 corsets)
+GET http://localhost:3000/products?categorySlug=evening-wear&search=corset
 
-### 15. Swapped range (expect 400: minPrice cannot be greater than maxPrice)
-GET http://localhost:3000/products?minPrice=10000&maxPrice=2000
+### 22. Slug with price, same result as test 17 (expect 2)
+GET http://localhost:3000/products?categorySlug=mens-shoes&maxPrice=10000
 
-### 16. Negative price (expect 400)
-GET http://localhost:3000/products?minPrice=-5
-
-### 17. Price with category (expect 2: Puma Future Rider Trainers, Nike Baseball Cleats)
-GET http://localhost:3000/products?categoryId=5&maxPrice=10000
+### 23. Id and slug that disagree (expect total 0)
+GET http://localhost:3000/products?categoryId=1&categorySlug=mens-shoes

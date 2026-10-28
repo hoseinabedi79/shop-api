@@ -27,6 +27,11 @@ export class ListProductsQueryDto {
   categoryId?: number;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  categorySlug?: string;
+
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(0)

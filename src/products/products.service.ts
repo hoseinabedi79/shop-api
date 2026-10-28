@@ -54,7 +54,7 @@ export class ProductsService {
   async findAll(
     query: ListProductsQueryDto,
   ): Promise<PaginatedResult<Product>> {
-    const { page, limit, categoryId, search, sort, order, minPrice, maxPrice } =
+    const { page, limit, categoryId, search, sort, order, minPrice, maxPrice, categorySlug } =
       query;
 
     if (
@@ -69,6 +69,11 @@ export class ProductsService {
     if (categoryId !== undefined) {
       where.categoryId = categoryId;
     }
+
+    if (categorySlug) {
+      where.category = { slug: categorySlug };
+    }
+
     if (search) {
       where.name = ILike(`%${search}%`);
     }
