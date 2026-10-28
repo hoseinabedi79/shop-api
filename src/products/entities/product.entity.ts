@@ -1,9 +1,9 @@
 import {
-  Column,
+  Column, CreateDateColumn,
   Entity, Index,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 
@@ -36,4 +36,13 @@ export class Product {
   @Index()
   @Column()
   categoryId: number;
+
+
+  // Set by the database when the row is inserted, never changes after
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
+
+  // Set on insert, then refreshed by TypeORM on every save
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt: Date;
 }

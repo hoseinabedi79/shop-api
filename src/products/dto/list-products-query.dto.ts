@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 // The only fields the list can be sorted by; anything else is rejected with 400
-export const PRODUCT_SORT_FIELDS = ['id', 'name', 'price', 'stock'] as const;
+export const PRODUCT_SORT_FIELDS = ['id', 'name', 'price', 'stock', 'createdAt'] as const;
 export type ProductSortField = (typeof PRODUCT_SORT_FIELDS)[number];
 
 export class ListProductsQueryDto {
